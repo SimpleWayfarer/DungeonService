@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package character;
+
+// Описание базовых характеристик
+message Stats {
+  int32 strength = 1;
+  int32 dexterity = 2;
+  int32 intelligence = 3;
+  // ... остальные
+}
+
+// Специфичные данные для систем
+message DnD5eData {
+  string class_name = 1;
+  int32 level = 2;
+  string race = 3;
+}
+
+message CthulhuData {
+  int32 sanity = 1;
+  string occupation = 2;
+}
+
+message StarfinderData {
+  string theme = 1;
+  string starship_role = 2;
+}
+
+// Основное сообщение создания персонажа
+message CreateCharacterRequest {
+  string user_id = 1;
+  string name = 2;
+  Stats stats = 3;
+
+  // Полиморфизм в gRPC: может быть только один из блоков данных
+  oneof system_data {
+    DnD5eData dnd5e = 4;
+    CthulhuData cthulhu = 5;
+    StarfinderData starfinder = 6;
+  }
+}
+
+message CharacterResponse {
+  string character_id = 1;
+  bool success = 2;
+  string message = 3;
+}
+
+// Описание сервиса
+service CharacterService {
+  rpc CreateCharacter (CreateCharacterRequest) returns (CharacterResponse);
+}
